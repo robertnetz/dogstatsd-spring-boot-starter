@@ -1,0 +1,7 @@
+datadog:
+  enabled: true
+
+logging:
+  level:
+    ROOT: info
+    com.github.robertnetz: trace
