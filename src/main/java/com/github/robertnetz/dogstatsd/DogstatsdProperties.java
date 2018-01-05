@@ -4,7 +4,7 @@ import com.google.common.base.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Configuration of our Swagger-UI Endpoint Documentation.
+ * Configuration of our Dogstatsd Writer.
  */
 @ConfigurationProperties(prefix = DatadogStatsdConfiguration.CONFIG_PREFIX)
 class DogstatsdProperties {
