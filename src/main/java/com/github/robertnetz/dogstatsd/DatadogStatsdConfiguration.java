@@ -24,7 +24,7 @@ import java.util.function.Predicate;
  * Spring Context Configuration for this Starter Project.
  */
 @Configuration
-@ConditionalOnProperty(prefix = DatadogStatsdConfiguration.CONFIG_PREFIX, name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = DatadogStatsdConfiguration.CONFIG_PREFIX, name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(DogstatsdProperties.class)
 class DatadogStatsdConfiguration {
 
