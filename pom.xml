@@ -108,7 +108,6 @@
                         <pushReleases>true</pushReleases>
                         <pushHotfixes>true</pushHotfixes>
                         <featureRebase>true</featureRebase>
-                        <noDeploy>true</noDeploy>
                         <pullMaster>true</pullMaster>
                         <pullDevelop>true</pullDevelop>
                     </configuration>
