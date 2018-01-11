@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Configuration of our Dogstatsd Writer.
  */
 @ConfigurationProperties(prefix = DatadogStatsdConfiguration.CONFIG_PREFIX)
-class DogstatsdProperties {
+public class DogstatsdProperties {
 
     /**
      * indicator to export metrics to statsd

@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 @Configuration
 @ConditionalOnProperty(prefix = DatadogStatsdConfiguration.CONFIG_PREFIX, name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(DogstatsdProperties.class)
-class DatadogStatsdConfiguration {
+public class DatadogStatsdConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatadogStatsdConfiguration.class);
     private static final String SYSTEM_PREFIX = "actuator.";

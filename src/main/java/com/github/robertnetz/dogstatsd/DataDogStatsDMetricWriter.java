@@ -15,10 +15,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Heavily inspired by Spring Boot's {@link org.springframework.boot.actuate.metrics.statsd.StatsdMetricWriter}.
- *
- * @see {@link org.springframework.boot.actuate.metrics.statsd.StatsdMetricWriter}
  */
-class DataDogStatsDMetricWriter implements MetricWriter, Closeable, StatsDClientErrorHandler {
+public class DataDogStatsDMetricWriter implements MetricWriter, Closeable, StatsDClientErrorHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDogStatsDMetricWriter.class);
 
