@@ -10,7 +10,27 @@ in 2.0.x, spring will introduce [Micrometer](https://micrometer.io/ "Micrometer 
 
 Downloads
 ---------
-tbd.
+Add `dogstatsd-spring-boot-starter` as dependency.
+
+If you use Maven, add the starter to your dependencies:
+```xml
+<dependency>
+    <groupId>com.github.robertnetz</groupId>
+    <artifactId>dogstatsd-spring-boot-starter</artifactId>
+    <version>x.x.x</version>
+</dependency>
+```
+
+If you use Gradle, add your dependency as follows:
+```gradle
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.github.robertnetz:dogstatsd-spring-boot-starter:x.x.x'
+}
+```
 
 Usage
 -----
