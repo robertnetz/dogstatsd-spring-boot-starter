@@ -1,5 +1,3 @@
-datadog:
-  enabled: true
 
 logging:
   level:

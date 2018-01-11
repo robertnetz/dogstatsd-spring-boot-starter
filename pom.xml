@@ -5,7 +5,7 @@
 
     <groupId>com.github.robertnetz</groupId>
     <artifactId>dogstatsd-spring-boot-starter</artifactId>
-    <version>0.5.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -108,6 +108,8 @@
                         <pushReleases>true</pushReleases>
                         <pushHotfixes>true</pushHotfixes>
                         <featureRebase>true</featureRebase>
+                        <pullMaster>true</pullMaster>
+                        <pullDevelop>true</pullDevelop>
                     </configuration>
                 </plugin>
 
