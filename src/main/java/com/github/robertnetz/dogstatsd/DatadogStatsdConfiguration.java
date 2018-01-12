@@ -2,6 +2,7 @@ package com.github.robertnetz.dogstatsd;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +31,14 @@ public class DatadogStatsdConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatadogStatsdConfiguration.class);
     private static final String SYSTEM_PREFIX = "actuator.";
-    public static final String CONFIG_PREFIX = "datadog";
+    static final String CONFIG_PREFIX = "datadog";
 
     private final MetricRegistry metricRegistry;
     private final String prefix;
     private final String host;
     private final int port;
     private final String[] tags;
+    private final boolean enableActuatorMetrics;
 
     /**
      * @param config         the configuration to use
@@ -51,13 +53,18 @@ public class DatadogStatsdConfiguration {
         this.prefix = config.getPrefix();
         this.tags = config.getTags();
 
+        this.enableActuatorMetrics = config.isIncludeActuatorMetrics();
+
         LOGGER.info("Exporting Metrics to statsd at '{}:{}' using prefix '{}' and tags '{}'", host, port, prefix, tags);
     }
 
     @Bean
     @ExportMetricReader
     MetricReader metricReader() {
-        addActuatorSystemMetrics(metricRegistry);
+        if (enableActuatorMetrics) {
+            addActuatorMetrics(metricRegistry);
+        }
+
         return new MetricRegistryMetricReader(metricRegistry);
     }
 
@@ -72,7 +79,8 @@ public class DatadogStatsdConfiguration {
      *
      * @param metricRegistry the metricRegistry to add the system metrics to
      */
-    private static void addActuatorSystemMetrics(final MetricRegistry metricRegistry) {
+    @VisibleForTesting
+    void addActuatorMetrics(final MetricRegistry metricRegistry) {
 
         final SystemPublicMetrics metrics = new SystemPublicMetrics();
         final List<String> doubles = Lists.newArrayList("systemload.average");

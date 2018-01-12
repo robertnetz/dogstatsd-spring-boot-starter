@@ -1,5 +1,6 @@
 package com.github.robertnetz.dogstatsd;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 import com.timgroup.statsd.StatsDClientErrorHandler;
@@ -16,7 +17,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Heavily inspired by Spring Boot's {@link org.springframework.boot.actuate.metrics.statsd.StatsdMetricWriter}.
  */
-public class DataDogStatsDMetricWriter implements MetricWriter, Closeable, StatsDClientErrorHandler {
+public class DataDogStatsDMetricWriter implements MetricWriter, Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDogStatsDMetricWriter.class);
 
@@ -30,7 +31,16 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable, Stats
      * @param tags   all metrics will be tagged with all of the tags
      */
     DataDogStatsDMetricWriter(final String prefix, final String host, final int port, final String... tags) {
-        this.client = new NonBlockingStatsDClient(prefix, host, port, tags, this);
+        this(new NonBlockingStatsDClient(prefix, host, port, tags, new ErrorHandler()), tags);
+    }
+
+    /**
+     * @param client the statsdclient to use
+     * @param tags all metrics will be tagged with all of the tags
+     */
+    @VisibleForTesting
+    DataDogStatsDMetricWriter(final StatsDClient client, final String[] tags) {
+        this.client = client;
         this.tags = tags;
     }
 
@@ -73,7 +83,7 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable, Stats
      */
     @Override
     public void reset(final String name) {
-        LOGGER.trace("reset requested for '{}'", name);
+        LOGGER.trace("reset requested for '{}' ignored", name);
     }
 
     /**
@@ -84,11 +94,18 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable, Stats
         this.client.stop();
     }
 
+
     /**
-     * {@inheritDoc}
+     * Our {@link StatsDClientErrorHandler}.
      */
-    @Override
-    public void handle(final Exception e) {
-        LOGGER.warn("Failed to write metric. Exception: {}, message: {}", e.getClass(), e.getMessage());
+    static class ErrorHandler implements StatsDClientErrorHandler {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void handle(final Exception e) {
+            LOGGER.warn("Failed to write metric. Exception: {}, message: {}", e.getClass(), e.getMessage());
+        }
     }
 }

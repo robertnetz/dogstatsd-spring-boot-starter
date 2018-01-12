@@ -1,0 +1,7 @@
+datadog:
+  port: 50506
+  tags:
+    - foo
+    - bar
+    - bam
+    - baz

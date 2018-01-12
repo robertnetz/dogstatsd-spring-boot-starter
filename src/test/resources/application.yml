@@ -1,5 +1,12 @@
-
 logging:
   level:
     ROOT: info
     com.github.robertnetz: trace
+
+spring:
+  main:
+    banner-mode: "off"
+
+datadog:
+  host: localhost
+  port: 50505

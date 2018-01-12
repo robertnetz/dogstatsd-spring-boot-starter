@@ -1,5 +1,6 @@
 package com.github.robertnetz.dogstatsd;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -10,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DogstatsdProperties {
 
     /**
-     * indicator to export metrics to statsd
+     * indicator to export metrics to the datadog-agent
      */
     private boolean enabled = false;
 
@@ -20,19 +21,24 @@ public class DogstatsdProperties {
     private String prefix;
 
     /**
-     * the hostname of the datadog statsd agent
+     * the hostname of the datadog-agent.
      */
     private String host = "localhost";
 
     /**
-     * the port of the datadog statsd agent
+     * the port of the datadog-agent
      */
     private int port = 8125;
 
     /**
-     * global tags to add to the service's metrics."
+     * global tags to add to the service's metrics.
      */
     private String[] tags;
+
+    /**
+     * indicator to export spring actuators' SystemPublicMetrics to the datadog-agent.
+     */
+    private boolean includeActuatorMetrics = true;
 
     public boolean isEnabled() {
         return enabled;
@@ -74,20 +80,41 @@ public class DogstatsdProperties {
         this.tags = tags;
     }
 
+    public boolean isIncludeActuatorMetrics() {
+        return includeActuatorMetrics;
+    }
+
+    public void setIncludeActuatorMetrics(boolean includeActuatorMetrics) {
+        this.includeActuatorMetrics = includeActuatorMetrics;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DogstatsdProperties that = (DogstatsdProperties) o;
-        return isEnabled() == that.isEnabled() &&
-                getPort() == that.getPort() &&
-                Objects.equal(getPrefix(), that.getPrefix()) &&
-                Objects.equal(getHost(), that.getHost()) &&
-                Objects.equal(getTags(), that.getTags());
+        return enabled == that.enabled &&
+                port == that.port &&
+                includeActuatorMetrics == that.includeActuatorMetrics &&
+                Objects.equal(prefix, that.prefix) &&
+                Objects.equal(host, that.host) &&
+                Objects.equal(tags, that.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(isEnabled(), getPrefix(), getHost(), getPort(), getTags());
+        return Objects.hashCode(enabled, prefix, host, port, tags, includeActuatorMetrics);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("enabled", enabled)
+                .add("prefix", prefix)
+                .add("host", host)
+                .add("port", port)
+                .add("tags", tags)
+                .add("includeActuatorMetrics", includeActuatorMetrics)
+                .toString();
     }
 }
