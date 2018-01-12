@@ -1,0 +1,4 @@
+datadog:
+  enabled: true
+  port: 50508
+  includeActuatorMetrics: false

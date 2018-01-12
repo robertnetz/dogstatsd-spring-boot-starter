@@ -1,0 +1,3 @@
+datadog:
+  port: 50507
+  prefix: service1
