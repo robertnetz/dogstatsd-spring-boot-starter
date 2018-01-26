@@ -13,7 +13,7 @@ public class DogstatsdProperties {
     /**
      * indicator to export metrics to the datadog-agent
      */
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     /**
      * a prefix that is preceded to the metric name
