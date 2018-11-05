@@ -50,7 +50,7 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable {
     @Override
     public void increment(final Delta<?> delta) {
         final String name = delta.getName();
-        checkArgument(!name.contains(":"), "colon is not allowed in metric names.");
+        checkArgument(!name.contains(":"), "colon is not allowed in metric names.", name);
 
         this.client.count(name, delta.getValue().longValue(), tags);
         LOGGER.trace("sent delta count: {}={}, tags='{}'", name, delta.getValue(), tags);
@@ -62,7 +62,7 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable {
     @Override
     public void set(final Metric<?> metric) {
         final String name = metric.getName();
-        checkArgument(!name.contains(":"), "colon is not allowed in metric names.");
+        checkArgument(!name.contains(":"), "colon is not allowed in metric names.", name);
 
         if (name.contains("timer.") && !name.contains("gauge.") && !name.contains("counter.")) {
             this.client.recordExecutionTime(name, metric.getValue().longValue(), tags);
