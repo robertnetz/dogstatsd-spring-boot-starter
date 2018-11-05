@@ -24,7 +24,7 @@ public class WriteTagsToDatadogIT extends AbstractIntegrationTest {
     @Test
     public void testMetricWriterPresent() {
         Assert.assertNotNull(metricWriter);
-        Assert.assertEquals(DataDogStatsDMetricWriter.class, metricWriter.getClass());
+        Assert.assertEquals(DatadogStatsdMetricWriter.class, metricWriter.getClass());
     }
 
     @Test

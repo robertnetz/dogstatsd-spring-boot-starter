@@ -71,7 +71,7 @@ public class DatadogStatsdConfiguration {
     @Bean
     @ExportMetricWriter
     MetricWriter metricWriter() {
-        return new DataDogStatsDMetricWriter(prefix, host, port, tags);
+        return new DatadogStatsdMetricWriter(prefix, host, port, tags);
     }
 
     /**

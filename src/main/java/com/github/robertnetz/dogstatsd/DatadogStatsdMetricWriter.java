@@ -17,9 +17,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Heavily inspired by Spring Boot's {@link org.springframework.boot.actuate.metrics.statsd.StatsdMetricWriter}.
  */
-public class DataDogStatsDMetricWriter implements MetricWriter, Closeable {
+public class DatadogStatsdMetricWriter implements MetricWriter, Closeable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataDogStatsDMetricWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatadogStatsdMetricWriter.class);
 
     private final StatsDClient client;
     private final String[] tags;
@@ -30,7 +30,7 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable {
      * @param port   the dogstatsd port
      * @param tags   all metrics will be tagged with all of the tags
      */
-    DataDogStatsDMetricWriter(final String prefix, final String host, final int port, final String... tags) {
+    DatadogStatsdMetricWriter(final String prefix, final String host, final int port, final String... tags) {
         this(new NonBlockingStatsDClient(prefix, host, port, tags, new ErrorHandler()), tags);
     }
 
@@ -39,7 +39,7 @@ public class DataDogStatsDMetricWriter implements MetricWriter, Closeable {
      * @param tags all metrics will be tagged with all of the tags
      */
     @VisibleForTesting
-    DataDogStatsDMetricWriter(final StatsDClient client, final String[] tags) {
+    DatadogStatsdMetricWriter(final StatsDClient client, final String[] tags) {
         this.client = client;
         this.tags = tags;
     }
