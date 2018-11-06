@@ -2,6 +2,7 @@ package com.github.robertnetz.dogstatsd;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.github.robertnetz.dogstatsd.sanitization.*;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ public class DatadogStatsdConfiguration {
     private final String[] tags;
     private final boolean enableActuatorMetrics;
 
+    @VisibleForTesting
+    final NameSanitizer nameSanitizer;
+
     /**
      * @param config         the configuration to use
      * @param metricRegistry the dropwizards' metric registry
@@ -52,10 +56,12 @@ public class DatadogStatsdConfiguration {
 
         this.prefix = config.getPrefix();
         this.tags = config.getTags();
+        this.nameSanitizer = nameSanitizerStrategy(config.getNameSanitizer());
 
         this.enableActuatorMetrics = config.isIncludeActuatorMetrics();
 
-        LOGGER.info("Exporting Metrics to statsd at '{}:{}' using prefix '{}' and tags '{}'", host, port, prefix, tags);
+        LOGGER.info("Exporting Metrics to statsd at '{}:{}' using prefix '{}' and tags '{}' nameSanitizer:{}",
+                host, port, prefix, tags, nameSanitizer);
     }
 
     @Bean
@@ -71,7 +77,7 @@ public class DatadogStatsdConfiguration {
     @Bean
     @ExportMetricWriter
     MetricWriter metricWriter() {
-        return new DatadogStatsdMetricWriter(prefix, host, port, tags);
+        return new DatadogStatsdMetricWriter(prefix, host, port, nameSanitizer, tags);
     }
 
     /**
@@ -101,6 +107,23 @@ public class DatadogStatsdConfiguration {
                     metricRegistry.register(name, (Gauge<Double>) () -> (Double) e.getValue().doubleValue());
                     LOGGER.debug("registering {} (double) to metricRegistry", name);
                 });
+    }
+
+    private NameSanitizer nameSanitizerStrategy(String nameSanitizer) {
+        NameSanitizer defaultStrategy = new RaiseOnColon();
+        if (nameSanitizer == null) {
+            return defaultStrategy;
+        }
+        switch (nameSanitizer) {
+            case "raise":
+                return defaultStrategy;
+            case "escape":
+                return new EscapeOnColon();
+            case "skip":
+                return new SkipOnColon();
+            default:
+                return defaultStrategy;
+        }
     }
 
 }

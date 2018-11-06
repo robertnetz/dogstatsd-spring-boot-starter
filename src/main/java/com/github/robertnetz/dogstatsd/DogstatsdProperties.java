@@ -36,6 +36,11 @@ public class DogstatsdProperties {
     private String[] tags;
 
     /**
+     * How are colons in metric names handled?
+     * Supported options are "raise", "escape", "skip" */
+    private String nameSanitizer = "raise";
+
+    /**
      * indicator to export spring actuators' SystemPublicMetrics to the datadog-agent.
      */
     private boolean includeActuatorMetrics = true;
@@ -80,6 +85,14 @@ public class DogstatsdProperties {
         this.tags = tags;
     }
 
+    public String getNameSanitizer() {
+        return nameSanitizer;
+    }
+
+    public void setNameSanitizer(String nameSanitizer) {
+        this.nameSanitizer = nameSanitizer;
+    }
+
     public boolean isIncludeActuatorMetrics() {
         return includeActuatorMetrics;
     }
@@ -98,12 +111,13 @@ public class DogstatsdProperties {
                 includeActuatorMetrics == that.includeActuatorMetrics &&
                 Objects.equal(prefix, that.prefix) &&
                 Objects.equal(host, that.host) &&
-                Objects.equal(tags, that.tags);
+                Objects.equal(tags, that.tags) &&
+                Objects.equal(nameSanitizer, that.nameSanitizer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(enabled, prefix, host, port, tags, includeActuatorMetrics);
+        return Objects.hashCode(enabled, prefix, host, port, tags, nameSanitizer, includeActuatorMetrics);
     }
 
     @Override
@@ -114,6 +128,7 @@ public class DogstatsdProperties {
                 .add("host", host)
                 .add("port", port)
                 .add("tags", tags)
+                .add("nameSanitizer", nameSanitizer)
                 .add("includeActuatorMetrics", includeActuatorMetrics)
                 .toString();
     }

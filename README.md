@@ -18,7 +18,7 @@ If you use Maven, add the starter to your dependencies:
 <dependency>
     <groupId>com.github.robertnetz</groupId>
     <artifactId>dogstatsd-spring-boot-starter</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.robertnetz:dogstatsd-spring-boot-starter:1.0.2'
+    compile 'com.github.robertnetz:dogstatsd-spring-boot-starter:1.0.3'
 }
 ```
 
@@ -68,9 +68,27 @@ datadog:
   enabled: false
 ```
 
-you might don't want to export spring actuators' [SystemPublicMetrics](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/endpoint/SystemPublicMetrics.html), then you'll have
+You might not want to export spring actuators' [SystemPublicMetrics](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/actuate/endpoint/SystemPublicMetrics.html), then you'll have
 to disable them explicitly by:
 ```yml
 datadog:
   includeActuatorMetrics: false
 ```
+
+### Metric name sanitization
+
+Some libraries you use might be recording metrics with `:` in their names.
+These are currently not supported by the `java-dogstatsd-client` and cause errors.
+There are a few strategies available:
+
+``` yml
+datadog:
+  nameSanitizer: raise  # default
+```
+
+The default strategy is `raise`, and will raise an exception when a `:` character is encountered in a metric name.
+This will allow you to quickly fix any code under your control which reported these metrics.
+
+Other available strategies are:
+* `escape`: replace any `:` with a `-`
+* `ignore`: silently skip reporting the metric with the illegal name
