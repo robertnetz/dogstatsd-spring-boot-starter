@@ -1,11 +1,7 @@
 package com.github.robertnetz.dogstatsd;
 
 import com.codahale.metrics.MetricRegistry;
-import com.github.robertnetz.dogstatsd.sanitization.EscapeOnColon;
-import com.github.robertnetz.dogstatsd.sanitization.RaiseOnColon;
-import com.github.robertnetz.dogstatsd.sanitization.SkipOnColon;
 import org.junit.Test;
-import org.springframework.util.Assert;
 
 import static org.mockito.Mockito.*;
 
@@ -17,7 +13,7 @@ public class DatadogStatsdConfigurationTest {
         when(config.isIncludeActuatorMetrics()).thenReturn(false);
 
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final DatadogStatsdConfiguration d = spy(new DatadogStatsdConfiguration(config, metricRegistry));
+        final DatadogStatsdConfiguration d = spy(new DatadogStatsdConfiguration(config, new NameSanitizer.RaiseOnColon(), metricRegistry));
 
         d.metricReader();
 
@@ -31,7 +27,7 @@ public class DatadogStatsdConfigurationTest {
         when(config.isIncludeActuatorMetrics()).thenReturn(true);
 
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final DatadogStatsdConfiguration d = spy(new DatadogStatsdConfiguration(config, metricRegistry));
+        final DatadogStatsdConfiguration d = spy(new DatadogStatsdConfiguration(config, new NameSanitizer.RaiseOnColon(), metricRegistry));
 
         d.metricReader();
 
@@ -68,49 +64,4 @@ public class DatadogStatsdConfigurationTest {
         verify(metricRegistry).register(eq("actuator.systemload.average"), anyObject());
 
     }
-
-    @Test
-    public void testDefaultNameSanitizer() {
-        final DogstatsdProperties config = mock(DogstatsdProperties.class);
-        when(config.getNameSanitizer()).thenReturn(null);
-
-        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final DatadogStatsdConfiguration d = new DatadogStatsdConfiguration(config, metricRegistry);
-
-        Assert.isInstanceOf(RaiseOnColon.class, d.nameSanitizer, "Expecting default strategy");
-    }
-
-    @Test
-    public void testUsingRaiseNameSanitizer() {
-        final DogstatsdProperties config = mock(DogstatsdProperties.class);
-        when(config.getNameSanitizer()).thenReturn("raise");
-
-        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final DatadogStatsdConfiguration d = new DatadogStatsdConfiguration(config, metricRegistry);
-
-        Assert.isInstanceOf(RaiseOnColon.class, d.nameSanitizer, "Expecting raise strategy");
-    }
-
-    @Test
-    public void testUsingSkipNameSanitizer() {
-        final DogstatsdProperties config = mock(DogstatsdProperties.class);
-        when(config.getNameSanitizer()).thenReturn("skip");
-
-        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final DatadogStatsdConfiguration d = new DatadogStatsdConfiguration(config, metricRegistry);
-
-        Assert.isInstanceOf(SkipOnColon.class, d.nameSanitizer, "Expecting skip strategy");
-    }
-
-    @Test
-    public void testUsingEscapeNameSanitizer() {
-        final DogstatsdProperties config = mock(DogstatsdProperties.class);
-        when(config.getNameSanitizer()).thenReturn("escape");
-
-        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final DatadogStatsdConfiguration d = new DatadogStatsdConfiguration(config, metricRegistry);
-
-        Assert.isInstanceOf(EscapeOnColon.class, d.nameSanitizer, "Expecting escape strategy");
-    }
-
 }

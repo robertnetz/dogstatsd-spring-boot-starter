@@ -1,7 +1,5 @@
 package com.github.robertnetz.dogstatsd;
 
-import com.github.robertnetz.dogstatsd.sanitization.NameSanitizer;
-import com.google.common.annotations.VisibleForTesting;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 import com.timgroup.statsd.StatsDClientErrorHandler;
@@ -41,7 +39,6 @@ public class DatadogStatsdMetricWriter implements MetricWriter, Closeable {
      * @param client the statsdclient to use
      * @param tags all metrics will be tagged with all of the tags
      */
-    @VisibleForTesting
     DatadogStatsdMetricWriter(final StatsDClient client, final NameSanitizer nameSanitizer, final String[] tags) {
         this.client = client;
         this.nameSanitizer = nameSanitizer;

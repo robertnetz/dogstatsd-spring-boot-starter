@@ -14,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @ActiveProfiles("actuatorDisabled")
