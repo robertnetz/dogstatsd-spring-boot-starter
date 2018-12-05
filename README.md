@@ -18,7 +18,7 @@ If you use Maven, add the starter to your dependencies:
 <dependency>
     <groupId>com.github.robertnetz</groupId>
     <artifactId>dogstatsd-spring-boot-starter</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.robertnetz:dogstatsd-spring-boot-starter:1.1'
+    compile 'com.github.robertnetz:dogstatsd-spring-boot-starter:1.2'
 }
 ```
 
