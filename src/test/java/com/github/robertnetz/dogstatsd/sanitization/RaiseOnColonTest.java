@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static junit.framework.TestCase.fail;
+
 public class RaiseOnColonTest {
 
     @Test
@@ -19,13 +21,18 @@ public class RaiseOnColonTest {
         Assert.assertEquals("long.nested.name", sanitized.get());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nameWithColonRaises() {
         final String metricName = "long:nested:name";
 
         NameSanitizer strategy = new RaiseOnColon();
 
-        strategy.sanitize(metricName);
+        try {
+            strategy.sanitize(metricName);
+            fail("Expected exception");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("long:nested:name"));
+        }
     }
 
 }
