@@ -18,10 +18,7 @@ import java.net.SocketException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {AbstractIntegrationTest.Config.class})
@@ -40,11 +37,16 @@ public abstract class AbstractIntegrationTest {
 
     @After
     public void tearDown() throws InterruptedException {
-        pool.shutdownNow();
+        pool.shutdown();
+
+        while (!pool.isTerminated()) {
+            LOGGER.debug("Waiting for the pool to be terminated");
+            TimeUnit.SECONDS.sleep(1);
+        }
 
     }
 
-    protected Future<List<String>> startUdpServer(final int itemsToRead) throws SocketException {
+    Future<List<String>> startUdpServer(final int itemsToRead) throws SocketException {
         return this.pool.submit(new UdpServer(new DatagramSocket(dataDogPort), itemsToRead));
     }
 
@@ -62,9 +64,13 @@ public abstract class AbstractIntegrationTest {
         private final byte[] buf = new byte[1024];
         private boolean running;
 
+        private final int timeoutSeconds = 11;
+        private final ExecutorService pool;
+
         UdpServer(final DatagramSocket socket, final int itemsToRead) {
             this.socket = socket;
             this.itemsToRead = itemsToRead;
+            this.pool = Executors.newSingleThreadExecutor();
         }
 
         @Override
@@ -76,15 +82,19 @@ public abstract class AbstractIntegrationTest {
             try {
                 while (running && result.size() < itemsToRead) {
 
-                    final DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                    socket.receive(packet);
-                    final String[] received = new String(packet.getData(), 0, packet.getLength()).split("\\r?\\n");
+                    final String[] received = pool.submit(() -> {
+                        final DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                        socket.receive(packet);
+                        return new String(packet.getData(), 0, packet.getLength()).split("\\r?\\n");
+                    }).get(timeoutSeconds, TimeUnit.SECONDS);
 
                     LOGGER.trace("dogstatsd-mock: Received: {}", Arrays.toString(received));
                     addItemsToResult(received, result, itemsToRead);
                 }
+            } catch (final TimeoutException e) {
+                LOGGER.debug("Failed to receive data within the given timeout.");
             } catch (final Exception e) {
-                System.err.println(e.toString());
+                LOGGER.error("Execution Failed", e);
             } finally {
                 socket.close();
                 LOGGER.info("Stopped Mocked dogstatsd");
