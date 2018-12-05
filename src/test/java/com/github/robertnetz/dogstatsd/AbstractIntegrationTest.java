@@ -1,7 +1,5 @@
 package com.github.robertnetz.dogstatsd;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -18,6 +16,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -71,7 +70,7 @@ public abstract class AbstractIntegrationTest {
         @Override
         public List<String> call() throws Exception {
             running = true;
-            final List<String> result = Lists.newArrayList();
+            final List<String> result = new LinkedList<>();
             LOGGER.info("Started mocked dogstatsd");
 
             try {
@@ -85,7 +84,7 @@ public abstract class AbstractIntegrationTest {
                     addItemsToResult(received, result, itemsToRead);
                 }
             } catch (final Exception e) {
-                System.err.println(Throwables.getStackTraceAsString(e));
+                System.err.println(e.toString());
             } finally {
                 socket.close();
                 LOGGER.info("Stopped Mocked dogstatsd");

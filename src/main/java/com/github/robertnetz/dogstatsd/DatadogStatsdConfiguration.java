@@ -2,9 +2,6 @@ package com.github.robertnetz.dogstatsd;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
-import com.github.robertnetz.dogstatsd.sanitization.*;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.autoconfigure.ExportMetricReader;
@@ -19,6 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -41,14 +39,14 @@ public class DatadogStatsdConfiguration {
     private final String[] tags;
     private final boolean enableActuatorMetrics;
 
-    @VisibleForTesting
     final NameSanitizer nameSanitizer;
 
     /**
      * @param config         the configuration to use
+     * @param nameSanitizer  the nameSanitizer to use
      * @param metricRegistry the dropwizards' metric registry
      */
-    DatadogStatsdConfiguration(final DogstatsdProperties config, final MetricRegistry metricRegistry) {
+    DatadogStatsdConfiguration(final DogstatsdProperties config, final NameSanitizer nameSanitizer, final MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
 
         this.host = config.getHost();
@@ -56,7 +54,7 @@ public class DatadogStatsdConfiguration {
 
         this.prefix = config.getPrefix();
         this.tags = config.getTags();
-        this.nameSanitizer = nameSanitizerStrategy(config.getNameSanitizer());
+        this.nameSanitizer = nameSanitizer;
 
         this.enableActuatorMetrics = config.isIncludeActuatorMetrics();
 
@@ -85,11 +83,12 @@ public class DatadogStatsdConfiguration {
      *
      * @param metricRegistry the metricRegistry to add the system metrics to
      */
-    @VisibleForTesting
     void addActuatorMetrics(final MetricRegistry metricRegistry) {
 
         final SystemPublicMetrics metrics = new SystemPublicMetrics();
-        final List<String> doubles = Lists.newArrayList("systemload.average");
+        final List<String> doubles = new LinkedList<>();
+        doubles.add("systemload.average");
+
         final Predicate<Metric> exceptionFilter = metric -> doubles.contains(metric.getName());
 
         metrics.metrics().stream()
@@ -108,22 +107,4 @@ public class DatadogStatsdConfiguration {
                     LOGGER.debug("registering {} (double) to metricRegistry", name);
                 });
     }
-
-    private NameSanitizer nameSanitizerStrategy(String nameSanitizer) {
-        NameSanitizer defaultStrategy = new RaiseOnColon();
-        if (nameSanitizer == null) {
-            return defaultStrategy;
-        }
-        switch (nameSanitizer) {
-            case "raise":
-                return defaultStrategy;
-            case "escape":
-                return new EscapeOnColon();
-            case "skip":
-                return new SkipOnColon();
-            default:
-                return defaultStrategy;
-        }
-    }
-
 }

@@ -1,8 +1,9 @@
 package com.github.robertnetz.dogstatsd;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Configuration of our Dogstatsd Writer.
@@ -37,7 +38,8 @@ public class DogstatsdProperties {
 
     /**
      * How are colons in metric names handled?
-     * Supported options are "raise", "escape", "skip" */
+     * Supported options are "raise", "escape", "skip"
+     */
     private String nameSanitizer = "raise";
 
     /**
@@ -104,32 +106,36 @@ public class DogstatsdProperties {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof DogstatsdProperties)) return false;
         DogstatsdProperties that = (DogstatsdProperties) o;
-        return enabled == that.enabled &&
-                port == that.port &&
-                includeActuatorMetrics == that.includeActuatorMetrics &&
-                Objects.equal(prefix, that.prefix) &&
-                Objects.equal(host, that.host) &&
-                Objects.equal(tags, that.tags) &&
-                Objects.equal(nameSanitizer, that.nameSanitizer);
+        return isEnabled() == that.isEnabled() &&
+                getPort() == that.getPort() &&
+                isIncludeActuatorMetrics() == that.isIncludeActuatorMetrics() &&
+                Objects.equals(getPrefix(), that.getPrefix()) &&
+                Objects.equals(getHost(), that.getHost()) &&
+                Arrays.equals(getTags(), that.getTags()) &&
+                Objects.equals(getNameSanitizer(), that.getNameSanitizer());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(enabled, prefix, host, port, tags, nameSanitizer, includeActuatorMetrics);
+
+        int result = Objects.hash(isEnabled(), getPrefix(), getHost(), getPort(), getNameSanitizer(), isIncludeActuatorMetrics());
+        result = 31 * result + Arrays.hashCode(getTags());
+        return result;
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("enabled", enabled)
-                .add("prefix", prefix)
-                .add("host", host)
-                .add("port", port)
-                .add("tags", tags)
-                .add("nameSanitizer", nameSanitizer)
-                .add("includeActuatorMetrics", includeActuatorMetrics)
-                .toString();
+        final StringBuilder sb = new StringBuilder("DogstatsdProperties{");
+        sb.append("enabled=").append(enabled);
+        sb.append(", prefix='").append(prefix).append('\'');
+        sb.append(", host='").append(host).append('\'');
+        sb.append(", port=").append(port);
+        sb.append(", tags=").append(Arrays.toString(tags));
+        sb.append(", nameSanitizer='").append(nameSanitizer).append('\'');
+        sb.append(", includeActuatorMetrics=").append(includeActuatorMetrics);
+        sb.append('}');
+        return sb.toString();
     }
 }
